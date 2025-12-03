@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Card Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #FEC260;
+            --accent: #4ECDC4;
+            --dark: #2D3142;
+            --light: #FFF8F0;
+            --shadow: rgba(45, 49, 66, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #FFE5EC 0%, #FFF8F0 50%, #E0F7FA 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--dark);
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px var(--shadow);
+            margin-bottom: 3rem;
+            animation: slideUp 0.6s ease-out 0.2s backwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid var(--light);
+            border-radius: 16px;
+            font-family: 'DM Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light);
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+        }
+
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(78, 205, 196, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+            line-height: 1.6;
+        }
+
+        .input-hint {
+            font-size: 0.9rem;
+            color: var(--dark);
+            opacity: 0.6;
+            margin-top: 0.5rem;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 1.25rem 2rem;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #FF8FB9);
+            color: white;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #FFD89B);
+            color: var(--dark);
+            box-shadow: 0 8px 24px rgba(254, 194, 96, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(254, 194, 96, 0.4);
+        }
+
+        .card-container {
+            display: grid;
+            gap: 2rem;
+            animation: slideUp 0.6s ease-out 0.4s backwards;
+        }
+
+        .bingo-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: cardPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes cardPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 8px;
+        }
+
+        .card-number {
+            font-size: 1rem;
+            color: var(--dark);
+            opacity: 0.6;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .bingo-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bingo-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 12px;
+            background: var(--light);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .bingo-cell:hover {
+            transform: scale(0.95);
+            background: var(--accent);
+            color: white;
+        }
+
+        .bingo-cell.free-space {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bingo-cell.free-space::before {
+            content: '★';
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0.1;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .bingo-cell.marked {
+            background: var(--secondary);
+            color: var(--dark);
+            transform: scale(0.95);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            background: var(--light);
+            color: var(--dark);
+            border-radius: 12px;
+            border: 2px solid transparent;
+        }
+
+        .btn-small:hover {
+            border-color: var(--accent);
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .error {
+            background: #FFE5E5;
+            color: #D32F2F;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #D32F2F;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .bingo-cell {
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .controls,
+            .card-actions,
+            header {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .card-container {
+                display: block;
+            }
+
+            .bingo-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                page-break-after: always;
+                box-shadow: none;
+                margin: 0;
+                padding: 1.5rem;
+                border: 2px solid #000;
+            }
+
+            .bingo-card:last-child {
+                page-break-after: auto;
+            }
+
+            .card-number {
+                color: #000 !important;
+                opacity: 1 !important;
+            }
+
+            .card-title {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color: #000 !important;
+                -webkit-text-fill-color: #000 !important;
+            }
+
+            .bingo-cell {
+                border: 2px solid #000;
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .bingo-cell.free-space {
+                background: #f0f0f0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .bingo-cell.free-space::before {
+                display: none;
+            }
+
+            .bingo-grid {
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 BINGO</h1>
+            <p class="subtitle">Create custom bingo cards in seconds</p>
+        </header>
+
+        <div class="controls">
+            <div class="form-group">
+                <label for="gridSize">Grid Size</label>
+                <input type="number" id="gridSize" min="3" max="10" value="5" placeholder="Enter grid size (3-10)">
+                <p class="input-hint">Choose a grid size between 3×3 and 10×10</p>
+            </div>
+
+            <div class="form-group">
+                <label for="numCards">Number of Cards</label>
+                <input type="number" id="numCards" min="1" max="50" value="1" placeholder="How many cards? (1-50)">
+                <p class="input-hint">Generate multiple unique cards at once</p>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="freeSpace" checked style="width: 24px; height: 24px; cursor: pointer;">
+                    <span>Include FREE space in center (odd grids only)</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="wordList">Word List</label>
+                <textarea id="wordList" placeholder="Enter words or phrases, one per line...">Cloud Computing
+DevOps
+Kubernetes
+Docker
+Terraform
+CI/CD Pipeline
+Microservices
+Load Balancer
+API Gateway
+Container
+Infrastructure as Code
+Serverless
+Auto Scaling
+Monitoring
+Logging
+Git
+Jenkins
+AWS
+Azure
+GCP
+Helm
+Istio
+Service Mesh
+Blue-Green Deployment</textarea>
+                <p class="input-hint">Enter at least as many words as cells in your grid</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateCards()">Generate Cards</button>
+                <button class="btn-secondary" onclick="printCards()" id="printBtn" style="display: none;">🖨️ Print All Cards</button>
+            </div>
+        </div>
+
+        <div id="cardContainer" class="card-container"></div>
+    </div>
+
+    <script>
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function createBingoCard(words, gridSize, cardNumber, includeFreeSpace) {
+            const card = document.createElement('div');
+            card.className = 'bingo-card';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            if (cardNumber) {
+                header.innerHTML = `<div class="card-title">BINGO</div><div class="card-number">Card #${cardNumber}</div>`;
+            } else {
+                header.innerHTML = '<div class="card-title">BINGO</div>';
+            }
+            card.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'bingo-grid';
+            grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+            const totalCells = gridSize * gridSize;
+            const centerCell = Math.floor(totalCells / 2);
+            const hasFreeSpace = includeFreeSpace && (gridSize % 2 === 1);
+
+            const shuffled = shuffleArray(words);
+            let wordIndex = 0;
+
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell';
+
+                if (hasFreeSpace && i === centerCell) {
+                    cell.classList.add('free-space');
+                    cell.textContent = 'FREE';
+                } else {
+                    if (wordIndex < shuffled.length) {
+                        cell.textContent = shuffled[wordIndex];
+                        wordIndex++;
+                    } else {
+                        cell.textContent = '?';
+                    }
+                }
+
+                cell.addEventListener('click', function() {
+                    if (!this.classList.contains('free-space')) {
+                        this.classList.toggle('marked');
+                    }
+                });
+
+                grid.appendChild(cell);
+            }
+
+            card.appendChild(grid);
+
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+            actions.innerHTML = `
+                <button class="btn-small" onclick="this.closest('.bingo-card').querySelectorAll('.bingo-cell.marked').forEach(c => c.classList.remove('marked'))">Clear Marks</button>
+            `;
+            card.appendChild(actions);
+
+            return card;
+        }
+
+        function generateCards() {
+            const gridSize = parseInt(document.getElementById('gridSize').value);
+            const numCards = parseInt(document.getElementById('numCards').value);
+            const includeFreeSpace = document.getElementById('freeSpace').checked;
+            const wordListText = document.getElementById('wordList').value.trim();
+            const container = document.getElementById('cardContainer');
+            const printBtn = document.getElementById('printBtn');
+
+            container.innerHTML = '';
+            printBtn.style.display = 'none';
+
+            if (gridSize < 3 || gridSize > 10) {
+                container.innerHTML = '<div class="error">⚠️ Grid size must be between 3 and 10</div>';
+                return;
+            }
+
+            if (numCards < 1 || numCards > 50) {
+                container.innerHTML = '<div class="error">⚠️ Number of cards must be between 1 and 50</div>';
+                return;
+            }
+
+            const words = wordListText.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+            const totalCells = gridSize * gridSize;
+            const hasFreeSpace = includeFreeSpace && (gridSize % 2 === 1);
+            const requiredWords = hasFreeSpace ? totalCells - 1 : totalCells;
+
+            if (words.length < requiredWords) {
+                container.innerHTML = `<div class="error">⚠️ You need at least ${requiredWords} words for a ${gridSize}×${gridSize} grid${hasFreeSpace ? ' (with FREE space)' : ''} (you have ${words.length})</div>`;
+                return;
+            }
+
+            for (let i = 0; i < numCards; i++) {
+                const card = createBingoCard(words, gridSize, numCards > 1 ? i + 1 : null, includeFreeSpace);
+                container.appendChild(card);
+            }
+
+            printBtn.style.display = 'block';
+
+            setTimeout(() => {
+                window.scrollTo({
+                    top: container.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        function printCards() {
+            window.print();
+        }
+
+        // Add print functionality with keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>
