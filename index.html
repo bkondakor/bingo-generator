@@ -116,6 +116,7 @@
         }
 
         input[type="number"],
+        input[type="text"],
         textarea {
             width: 100%;
             padding: 1rem;
@@ -132,6 +133,7 @@
         }
 
         input[type="number"]:focus,
+        input[type="text"]:focus,
         textarea:focus {
             outline: none;
             border-color: var(--accent);
@@ -447,6 +449,19 @@
             </div>
 
             <div class="form-group">
+                <label for="cardTitle">Card Title</label>
+                <input type="text" id="cardTitle" value="BINGO" placeholder="Enter card title" style="width: 100%; padding: 1rem; border: 3px solid var(--light); border-radius: 16px; font-family: 'DM Mono', monospace; font-size: 1rem; transition: all 0.3s ease; background: var(--light);">
+                <p class="input-hint">Customize the title that appears on each card</p>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" id="showCardNumber" checked style="width: 24px; height: 24px; cursor: pointer;">
+                    <span>Show card numbers on printed cards</span>
+                </label>
+            </div>
+
+            <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
                     <input type="checkbox" id="freeSpace" checked style="width: 24px; height: 24px; cursor: pointer;">
                     <span>Include FREE space in center (odd grids only)</span>
@@ -501,16 +516,16 @@ Blue-Green Deployment</textarea>
             return shuffled;
         }
 
-        function createBingoCard(words, gridSize, cardNumber, includeFreeSpace) {
+        function createBingoCard(words, gridSize, cardNumber, includeFreeSpace, cardTitle = 'BINGO', showCardNumber = true) {
             const card = document.createElement('div');
             card.className = 'bingo-card';
 
             const header = document.createElement('div');
             header.className = 'card-header';
-            if (cardNumber) {
-                header.innerHTML = `<div class="card-title">BINGO</div><div class="card-number">Card #${cardNumber}</div>`;
+            if (cardNumber && showCardNumber) {
+                header.innerHTML = `<div class="card-title">${cardTitle}</div><div class="card-number">Card #${cardNumber}</div>`;
             } else {
-                header.innerHTML = '<div class="card-title">BINGO</div>';
+                header.innerHTML = `<div class="card-title">${cardTitle}</div>`;
             }
             card.appendChild(header);
 
@@ -566,6 +581,8 @@ Blue-Green Deployment</textarea>
             const gridSize = parseInt(document.getElementById('gridSize').value);
             const numCards = parseInt(document.getElementById('numCards').value);
             const includeFreeSpace = document.getElementById('freeSpace').checked;
+            const cardTitle = document.getElementById('cardTitle').value.trim() || 'BINGO';
+            const showCardNumber = document.getElementById('showCardNumber').checked;
             const wordListText = document.getElementById('wordList').value.trim();
             const container = document.getElementById('cardContainer');
             const printBtn = document.getElementById('printBtn');
@@ -594,7 +611,7 @@ Blue-Green Deployment</textarea>
             }
 
             for (let i = 0; i < numCards; i++) {
-                const card = createBingoCard(words, gridSize, numCards > 1 ? i + 1 : null, includeFreeSpace);
+                const card = createBingoCard(words, gridSize, numCards > 1 ? i + 1 : null, includeFreeSpace, cardTitle, showCardNumber);
                 container.appendChild(card);
             }
 
